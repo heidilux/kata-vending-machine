@@ -4,13 +4,17 @@
 class VendingMachine
 {
     public $display;
+    public $currentAmount;
     public $products = [];
     public $validCoins = [];
     public $bank = [];
+    public $coinReturnContents= [];
 
     public function __construct()
     {
         $this->display = "INSERT COINS";
+        $this->currentAmount = 0;
+        $this->coinReturnContents = [];
         $this->validCoins = ['nickel', 'dime', 'quarter'];
         $this->bank = [
             'nickel'    => 10,
@@ -33,12 +37,29 @@ class VendingMachine
         ];
     }
 
-    public function acceptCoins()
+    public function acceptCoins(array $coins)
     {
         // As a vendor
         // I want a vending machine that accepts coins
         // So that I can collect money from the customer
-
+        foreach ($coins as $qty => $type) {
+            switch ($type) {
+                case 'nickel':
+                    $this->currentAmount += $qty * 5;
+                    $this->display = '$' . (number_format($this->currentAmount, 2))/100;
+                    break;
+                case 'dime':
+                    //
+                    break;
+                case 'quarter':
+                    //
+                    break;
+                default:
+                    $this->coinReturnContents = [
+                        $type => ++$qty
+                    ];
+            }
+        }
     }
 
     public function selectProduct()
