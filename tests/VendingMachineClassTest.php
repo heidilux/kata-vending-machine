@@ -142,4 +142,17 @@ class VendingMachineClassTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($coins, $this->machine->coinReturnContents);
     }
 
+    /*
+     * Test various combinations of selecting a product
+     */
+
+    public function testCustomerMakesASelectionWithNoMoneyInserted()
+    {
+        $this->machine->selectProduct('cola');
+        $this->assertEquals('$1.00', $this->machine->display);
+        $this->machine->selectProduct('chips');
+        $this->assertEquals('$0.50', $this->machine->display);
+        $this->machine->selectProduct('candy');
+        $this->assertEquals('$0.65', $this->machine->display);
+    }
 }
