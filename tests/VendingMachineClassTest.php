@@ -190,4 +190,19 @@ class VendingMachineClassTest extends PHPUnit_Framework_TestCase
             'quarter'   => 13
         ], $this->machine->bank);
     }
+
+    public function testCustomerMakesASelectionThatRequiresMoreChange()
+    {
+        $coins = ['quarter' => 4, 'nickel' => 6];
+        $this->machine->acceptCoins($coins);
+        $this->machine->selectProduct('cola');
+        $this->assertEquals('THANK YOU', $this->machine->display);
+        $this->assertTrue($this->machine->productDispensed);
+        $this->assertEquals(['nickel' => 1, 'quarter' => 1], $this->machine->coinReturnContents);
+        $this->assertEquals([
+            'nickel'    => 15,
+            'dime'      => 10,
+            'quarter'   => 13
+        ], $this->machine->bank);
+    }
 }
