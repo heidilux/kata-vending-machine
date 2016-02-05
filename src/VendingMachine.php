@@ -44,6 +44,14 @@ class VendingMachine
         ];
     }
 
+    public function checkDisplay()
+    {
+        if ($this->bank['nickel'] < 2 || $this->bank['dime'] == 0) {
+            $this->display = 'EXACT CHANGE ONLY';
+        }
+        return $this->display;
+    }
+
     public function acceptCoins(array $coins)
     {
         setlocale(LC_MONETARY, 'en_US.UTF-8');
@@ -77,17 +85,25 @@ class VendingMachine
     {
         $productPrice = $this->products[$product]['price'];
         if ($this->currentAmount == 0) {
-            $displayAmount = $this->products[$product]['price'] / 100;
-            $this->display = "PRICE " . money_format("%.2n", $displayAmount);
+            if ($this->products[$product]['inventory'] == 0) {
+                $this->display = "SOLD OUT";
+            } else {
+                $displayAmount = $this->products[$product]['price'] / 100;
+                $this->display = "PRICE " . money_format("%.2n", $displayAmount);
+            }
         }
 
         if ($this->currentAmount >= $productPrice) {
-            $this->display = 'THANK YOU';
-            $this->productDispensed = true;
-            foreach ($this->coins as $type => $qty) {
-                $this->bank[$type] += $qty;
+            if ($this->products[$product]['inventory'] == 0) {
+                $this->display = "SOLD OUT";
+            } else {
+                $this->display = 'THANK YOU';
+                $this->productDispensed = true;
+                foreach ($this->coins as $type => $qty) {
+                    $this->bank[$type] += $qty;
+                }
+                $overPayment = $this->currentAmount - $productPrice;
             }
-            $overPayment = $this->currentAmount - $productPrice;
         }
 
         if ($overPayment > 0) {
