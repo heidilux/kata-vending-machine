@@ -74,7 +74,7 @@ class VendingMachine
                     $this->display = money_format("%.2n", $displayAmount);
                     break;
                 case 'penny':
-                    $this->coinReturnContents = [$qty => $type];
+                    $this->coinReturnContents[$type] += $qty;
                     break;
             }
         }

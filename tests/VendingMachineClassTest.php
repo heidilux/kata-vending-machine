@@ -58,21 +58,30 @@ class VendingMachineClassTest extends PHPUnit_Framework_TestCase
 
     public function testCustomerInsertsTwoNickels()
     {
-        $this->machine->acceptCoins(['nickel' => 2]);
+        $this->machine->acceptCoins(['nickel' => 1]);
+        $this->assertEquals(5, $this->machine->currentAmount);
+        $this->assertEquals('$0.05', $this->machine->checkDisplay());
+        $this->machine->acceptCoins(['nickel' => 1]);
         $this->assertEquals(10, $this->machine->currentAmount);
         $this->assertEquals('$0.10', $this->machine->checkDisplay());
     }
 
     public function testCustomerInsertsTwoDimes()
     {
-        $this->machine->acceptCoins(['dime' => 2]);
+        $this->machine->acceptCoins(['dime' => 1]);
+        $this->assertEquals(10, $this->machine->currentAmount);
+        $this->assertEquals('$0.10', $this->machine->checkDisplay());
+        $this->machine->acceptCoins(['dime' => 1]);
         $this->assertEquals(20, $this->machine->currentAmount);
         $this->assertEquals('$0.20', $this->machine->checkDisplay());
     }
 
     public function testCustomerInsertsTwoQuarters()
     {
-        $this->machine->acceptCoins(['quarter' => 2]);
+        $this->machine->acceptCoins(['quarter' => 1]);
+        $this->assertEquals(25, $this->machine->currentAmount);
+        $this->assertEquals('$0.25', $this->machine->checkDisplay());
+        $this->machine->acceptCoins(['quarter' => 1]);
         $this->assertEquals(50, $this->machine->currentAmount);
         $this->assertEquals('$0.50', $this->machine->checkDisplay());
     }
@@ -81,7 +90,7 @@ class VendingMachineClassTest extends PHPUnit_Framework_TestCase
     {
         $this->machine->acceptCoins(['penny' => 1]);
         $this->assertEquals(0, $this->machine->currentAmount);
-        $this->assertEquals([1 => 'penny'], $this->machine->coinReturnContents);
+        $this->assertEquals(['penny' => 1], $this->machine->coinReturnContents);
         $this->assertEquals('INSERT COINS', $this->machine->checkDisplay());
     }
 
@@ -89,49 +98,89 @@ class VendingMachineClassTest extends PHPUnit_Framework_TestCase
     {
         $this->machine->acceptCoins(['penny' => 2]);
         $this->assertEquals(0, $this->machine->currentAmount);
-        $this->assertEquals([2 => 'penny'], $this->machine->coinReturnContents);
+        $this->assertEquals(['penny' => 2], $this->machine->coinReturnContents);
         $this->assertEquals('INSERT COINS', $this->machine->checkDisplay());
     }
 
     public function testCustomerInsertsOneNickelAndOneDime()
     {
-        $this->machine->acceptCoins(['nickel' => 1, 'dime' => 1]);
+        $this->machine->acceptCoins(['nickel' => 1]);
+        $this->assertEquals(5, $this->machine->currentAmount);
+        $this->assertEquals('$0.05', $this->machine->checkDisplay());
+        $this->machine->acceptCoins(['dime' => 1]);
         $this->assertEquals(15, $this->machine->currentAmount);
         $this->assertEquals('$0.15', $this->machine->checkDisplay());
     }
 
     public function testCustomerInsertsOneNickelAndOneDimeAndOneQuarter()
     {
-        $this->machine->acceptCoins(['nickel' => 1, 'dime' => 1, 'quarter' => 1]);
+        $this->machine->acceptCoins(['nickel' => 1]);
+        $this->assertEquals(5, $this->machine->currentAmount);
+        $this->assertEquals('$0.05', $this->machine->checkDisplay());
+        $this->machine->acceptCoins(['dime' => 1]);
+        $this->assertEquals(15, $this->machine->currentAmount);
+        $this->assertEquals('$0.15', $this->machine->checkDisplay());
+        $this->machine->acceptCoins(['quarter' => 1]);
         $this->assertEquals(40, $this->machine->currentAmount);
         $this->assertEquals('$0.40', $this->machine->checkDisplay());
     }
 
-    public function testCustomerInsertsTwoNickelsTwoDimesAndTwoQuarters()
-    {
-        $this->machine->acceptCoins(['nickel' => 2, 'dime' => 2, 'quarter' => 2]);
-        $this->assertEquals(80, $this->machine->currentAmount);
-        $this->assertEquals('$0.80', $this->machine->checkDisplay());
-    }
-
     public function testCustomerInsertsOneNickelAndOnePenny()
     {
-        $this->machine->acceptCoins(['penny' => 1, 'nickel' => 1]);
+        $this->machine->acceptCoins(['penny' => 1]);
+        $this->assertEquals(0, $this->machine->currentAmount);
+        $this->assertEquals('INSERT COINS', $this->machine->checkDisplay());
+        $this->assertEquals(['penny' => 1], $this->machine->coinReturnContents);
+        $this->machine->acceptCoins(['nickel' => 1]);
         $this->assertEquals(5, $this->machine->currentAmount);
-        $this->assertEquals([1 => 'penny'], $this->machine->coinReturnContents);
         $this->assertEquals('$0.05', $this->machine->checkDisplay());
     }
 
+    // Okay, here's the mother test...
     public function testCustomerInsertsOneNickelTwoDimesThreeQuartersAndFourPennies()
     {
-        $this->machine->acceptCoins([
-            'penny'     => 4,
-            'nickel'    => 1,
-            'dime'      => 2,
-            'quarter'   => 3
-        ]);
+        $this->machine->acceptCoins(['nickel' => 1]);
+        $this->assertEquals(5, $this->machine->currentAmount);
+        $this->assertEquals('$0.05', $this->machine->checkDisplay());
+
+        $this->machine->acceptCoins(['dime' => 1]);
+        $this->assertEquals(15, $this->machine->currentAmount);
+        $this->assertEquals('$0.15', $this->machine->checkDisplay());
+
+        $this->machine->acceptCoins(['penny' => 1]);
+        $this->assertEquals(15, $this->machine->currentAmount);
+        $this->assertEquals('$0.15', $this->machine->checkDisplay());
+        $this->assertEquals(['penny' => 1], $this->machine->coinReturnContents);
+
+        $this->machine->acceptCoins(['quarter' => 1]);
+        $this->assertEquals(40, $this->machine->currentAmount);
+        $this->assertEquals('$0.40', $this->machine->checkDisplay());
+
+        $this->machine->acceptCoins(['dime' => 1]);
+        $this->assertEquals(50, $this->machine->currentAmount);
+        $this->assertEquals('$0.50', $this->machine->checkDisplay());
+
+        $this->machine->acceptCoins(['quarter' => 1]);
+        $this->assertEquals(75, $this->machine->currentAmount);
+        $this->assertEquals('$0.75', $this->machine->checkDisplay());
+
+        $this->machine->acceptCoins(['penny' => 1]);
+        $this->assertEquals(75, $this->machine->currentAmount);
+        $this->assertEquals('$0.75', $this->machine->checkDisplay());
+        $this->assertEquals(['penny' => 2], $this->machine->coinReturnContents);
+
+        $this->machine->acceptCoins(['penny' => 1]);
+        $this->assertEquals(75, $this->machine->currentAmount);
+        $this->assertEquals('$0.75', $this->machine->checkDisplay());
+        $this->assertEquals(['penny' => 3], $this->machine->coinReturnContents);
+
+        $this->machine->acceptCoins(['penny' => 1]);
+        $this->assertEquals(75, $this->machine->currentAmount);
+        $this->assertEquals('$0.75', $this->machine->checkDisplay());
+        $this->assertEquals(['penny' => 4], $this->machine->coinReturnContents);
+
+        $this->machine->acceptCoins(['quarter' => 1]);
         $this->assertEquals(100, $this->machine->currentAmount);
-        $this->assertEquals([4 => 'penny'], $this->machine->coinReturnContents);
         $this->assertEquals('$1.00', $this->machine->checkDisplay());
     }
 
