@@ -4,11 +4,11 @@
 class VendingMachine
 {
     public $display;
-    public $currentAmount;
+    public $bank = [];
     public $products = [];
+    public $currentAmount;
     public $validCoins = [];
     public $invalidCoins = [];
-    public $bank = [];
     public $coinReturnContents= [];
 
     public function __construct()
@@ -41,13 +41,9 @@ class VendingMachine
 
     public function acceptCoins(array $coins)
     {
-        // As a vendor
-        // I want a vending machine that accepts coins
-        // So that I can collect money from the customer
-
         setlocale(LC_MONETARY, 'en_US.UTF-8');
 
-        foreach ($coins as $qty => $type) {
+        foreach ($coins as $type => $qty) {
             switch ($type) {
                 case 'nickel':
                     $this->currentAmount += $qty * 5;
