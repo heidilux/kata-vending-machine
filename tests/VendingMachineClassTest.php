@@ -162,6 +162,12 @@ class VendingMachineClassTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('PRICE $0.65', $this->machine->display);
     }
 
+    public function testNoMoneyInsertedAndSelectedProductIsSoldOut()
+    {
+        $this->machine->selectProduct('cola');
+        $this->assertEquals('SOLD OUT', $this->machine->display);
+    }
+
     public function testCustomerMakesASelectionWithExactChangeInserted()
     {
         $coins = ['quarter' => 4];
