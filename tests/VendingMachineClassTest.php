@@ -17,6 +17,11 @@ class VendingMachineClassTest extends PHPUnit_Framework_TestCase
     {
         $this->assertEquals('INSERT COINS', $this->machine->display);
         $this->assertEquals(0, $this->machine->currentAmount);
+        $this->assertEquals([
+            'nickel'  => 10,
+            'dime'    => 10,
+            'quarter' => 10,
+        ], $this->machine->bank);
         $this->assertEquals([], $this->machine->coinReturnContents);
     }
 
@@ -162,12 +167,27 @@ class VendingMachineClassTest extends PHPUnit_Framework_TestCase
         $coins = ['quarter' => 4];
         $this->machine->acceptCoins($coins);
         $this->machine->selectProduct('cola');
+        $this->assertEquals('THANK YOU', $this->machine->display);
+        $this->assertTrue($this->machine->productDispensed);
         $this->assertEquals([
             'nickel'    => 10,
             'dime'      => 10,
             'quarter'   => 14
         ], $this->machine->bank);
+    }
+
+    public function testCustomerMakesASelectionThatRequiresChange()
+    {
+        $coins = ['quarter' => 3];
+        $this->machine->acceptCoins($coins);
+        $this->machine->selectProduct('candy');
         $this->assertEquals('THANK YOU', $this->machine->display);
         $this->assertTrue($this->machine->productDispensed);
+        $this->assertEquals(['dime' => 1], $this->machine->coinReturnContents);
+        $this->assertEquals([
+            'nickel'    => 10,
+            'dime'      => 9,
+            'quarter'   => 13
+        ], $this->machine->bank);
     }
 }

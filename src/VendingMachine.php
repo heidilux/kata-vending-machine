@@ -5,6 +5,7 @@ class VendingMachine
 {
     public $display;
     public $coins = [];
+    public $change = [];
     public $bank = [];
     public $products = [];
     public $currentAmount;
@@ -17,6 +18,7 @@ class VendingMachine
     {
         $this->display = "INSERT COINS";
         $this->productDispensed = false;
+        $this->change = [];
         $this->currentAmount = 0;
         $this->coinReturnContents = [];
         $this->validCoins = ['nickel', 'dime', 'quarter'];
@@ -73,26 +75,44 @@ class VendingMachine
 
     public function selectProduct($product)
     {
+        $productPrice = $this->products[$product]['price'];
         if ($this->currentAmount == 0) {
             $displayAmount = $this->products[$product]['price'] / 100;
             $this->display = "PRICE " . money_format("%.2n", $displayAmount);
         }
 
-        if ($this->currentAmount >= $this->products[$product]['price']) {
+        if ($this->currentAmount >= $productPrice) {
             $this->display = 'THANK YOU';
             $this->productDispensed = true;
             foreach ($this->coins as $type => $qty) {
                 $this->bank[$type] += $qty;
             }
+            $overPayment = $this->currentAmount - $productPrice;
         }
 
+        if ($overPayment > 0) {
+            $this->makeChange($overPayment);
+        }
     }
 
-    public function makeChange()
+    public function makeChange($overPayment)
     {
-        // As a vendor
-        // I want customers to receive correct change
-        // So that they will use the vending machine again
+        while ($overPayment >= 5) {
+            if ($overPayment >= 25) {
+                $this->change['quarter'] = 1;
+                $this->bank['quarter'] -= 1;
+                $overPayment -= 25;
+            } elseif ($overPayment >= 10) {
+                $this->change['dime'] = 1;
+                $this->bank['dime'] -= 1;
+                $overPayment -= 10;
+            } elseif ($overPayment >= 5) {
+                $this->change['nickel'] = 1;
+                $this->bank['nickel'] -= 1;
+                $overPayment -= 5;
+            }
+        }
+        $this->coinReturnContents = $this->change;
 
     }
 
