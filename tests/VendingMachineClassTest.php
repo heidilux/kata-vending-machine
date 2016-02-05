@@ -133,4 +133,16 @@ class VendingMachineClassTest extends PHPUnit_Framework_TestCase
         ], $this->machine->bank);
     }
 
+    public function testCustomerInsertsTwoNickelsTwoDimesAndTwoQuarters()
+    {
+        $this->machine->acceptCoins(['nickel' => 2, 'dime' => 2, 'quarter' => 2]);
+        $this->assertEquals(80, $this->machine->currentAmount);
+        $this->assertEquals('$0.80', $this->machine->display);
+        $this->assertEquals([
+            'nickel' => 12,
+            'dime' => 12,
+            'quarter' => 12
+        ], $this->machine->bank);
+    }
+
 }
