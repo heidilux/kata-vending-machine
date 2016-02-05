@@ -4,16 +4,19 @@
 class VendingMachine
 {
     public $display;
+    public $coins = [];
     public $bank = [];
     public $products = [];
     public $currentAmount;
     public $validCoins = [];
+    public $productDispensed;
     public $invalidCoins = [];
     public $coinReturnContents= [];
 
     public function __construct()
     {
         $this->display = "INSERT COINS";
+        $this->productDispensed = false;
         $this->currentAmount = 0;
         $this->coinReturnContents = [];
         $this->validCoins = ['nickel', 'dime', 'quarter'];
@@ -42,24 +45,22 @@ class VendingMachine
     public function acceptCoins(array $coins)
     {
         setlocale(LC_MONETARY, 'en_US.UTF-8');
+        $this->coins = $coins;
 
         foreach ($coins as $type => $qty) {
             switch ($type) {
                 case 'nickel':
                     $this->currentAmount += $qty * 5;
-                    $this->bank['nickel'] += $qty;
                     $displayAmount = $this->currentAmount / 100;
                     $this->display = money_format("%.2n", $displayAmount);
                     break;
                 case 'dime':
                     $this->currentAmount += $qty * 10;
-                    $this->bank['dime'] += $qty;
                     $displayAmount = $this->currentAmount / 100;
                     $this->display = money_format("%.2n", $displayAmount);
                     break;
                 case 'quarter':
                     $this->currentAmount += $qty * 25;
-                    $this->bank['quarter'] += $qty;
                     $displayAmount = $this->currentAmount / 100;
                     $this->display = money_format("%.2n", $displayAmount);
                     break;
@@ -74,8 +75,17 @@ class VendingMachine
     {
         if ($this->currentAmount == 0) {
             $displayAmount = $this->products[$product]['price'] / 100;
-            $this->display = money_format("%.2n", $displayAmount);
+            $this->display = "PRICE " . money_format("%.2n", $displayAmount);
         }
+
+        if ($this->currentAmount >= $this->products[$product]['price']) {
+            $this->display = 'THANK YOU';
+            $this->productDispensed = true;
+            foreach ($this->coins as $type => $qty) {
+                $this->bank[$type] += $qty;
+            }
+        }
+
     }
 
     public function makeChange()

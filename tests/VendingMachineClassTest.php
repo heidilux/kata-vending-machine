@@ -9,9 +9,9 @@ class VendingMachineClassTest extends PHPUnit_Framework_TestCase
         $this->machine = new VendingMachine();
     }
 
-    /*
+    /***************************************************
      * Test inserting coins of various combinations
-     */
+     ***************************************************/
 
     public function testInitialStateOfVendingMachine()
     {
@@ -131,6 +131,7 @@ class VendingMachineClassTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($coins, $this->machine->coinReturnContents);
     }
 
+    // this one might be a bit off with the way the coins are returned...
     public function testCustomerGetsAllCoinsBackAfterCoinReturnIsPushed()
     {
         $coins = ['nickel' => 1, 'dime' => 4, 'quarter' => 6];
@@ -142,17 +143,31 @@ class VendingMachineClassTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($coins, $this->machine->coinReturnContents);
     }
 
-    /*
+    /***************************************************
      * Test various combinations of selecting a product
-     */
+     ***************************************************/
 
     public function testCustomerMakesASelectionWithNoMoneyInserted()
     {
         $this->machine->selectProduct('cola');
-        $this->assertEquals('$1.00', $this->machine->display);
+        $this->assertEquals('PRICE $1.00', $this->machine->display);
         $this->machine->selectProduct('chips');
-        $this->assertEquals('$0.50', $this->machine->display);
+        $this->assertEquals('PRICE $0.50', $this->machine->display);
         $this->machine->selectProduct('candy');
-        $this->assertEquals('$0.65', $this->machine->display);
+        $this->assertEquals('PRICE $0.65', $this->machine->display);
+    }
+
+    public function testCustomerMakesASelectionWithExactChangeInserted()
+    {
+        $coins = ['quarter' => 4];
+        $this->machine->acceptCoins($coins);
+        $this->machine->selectProduct('cola');
+        $this->assertEquals([
+            'nickel'    => 10,
+            'dime'      => 10,
+            'quarter'   => 14
+        ], $this->machine->bank);
+        $this->assertEquals('THANK YOU', $this->machine->display);
+        $this->assertTrue($this->machine->productDispensed);
     }
 }
