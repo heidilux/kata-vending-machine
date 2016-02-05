@@ -46,9 +46,8 @@ class VendingMachine
 
     public function checkDisplay()
     {
-        if ($this->bank['nickel'] < 2 || $this->bank['dime'] == 0) {
-            $this->display = 'EXACT CHANGE ONLY';
-        }
+        $this->checkIfWeRequireExactChange();
+
         return $this->display;
     }
 
@@ -129,7 +128,6 @@ class VendingMachine
             }
         }
         $this->coinReturnContents = $this->change;
-
     }
 
     public function returnCoins(array $coins)
@@ -137,12 +135,10 @@ class VendingMachine
         $this->coinReturnContents = $coins;
     }
 
-    public function exactChangeOnly()
+    public function checkIfWeRequireExactChange()
     {
-        // As a customer
-        // I want to ve told when exact change is required
-        // So that I can determine if I can buy something with the money
-        // I have before inserting it...
-
+        if ($this->bank['nickel'] < 2 || $this->bank['dime'] == 0) {
+            $this->display = 'EXACT CHANGE ONLY';
+        }
     }
 }
