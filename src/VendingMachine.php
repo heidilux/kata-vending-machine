@@ -7,6 +7,7 @@ class VendingMachine
     public $currentAmount;
     public $products = [];
     public $validCoins = [];
+    public $invalidCoins = [];
     public $bank = [];
     public $coinReturnContents= [];
 
@@ -16,6 +17,7 @@ class VendingMachine
         $this->currentAmount = 0;
         $this->coinReturnContents = [];
         $this->validCoins = ['nickel', 'dime', 'quarter'];
+        $this->invalidCoins = ['penny'];
         $this->bank = [
             'nickel'    => 10,
             'dime'      => 10,
@@ -49,23 +51,25 @@ class VendingMachine
             switch ($type) {
                 case 'nickel':
                     $this->currentAmount += $qty * 5;
+                    $this->bank['nickel'] += $qty;
                     $displayAmount = $this->currentAmount / 100;
                     $this->display = money_format("%.2n", $displayAmount);
                     break;
                 case 'dime':
                     $this->currentAmount += $qty * 10;
+                    $this->bank['dime'] += $qty;
                     $displayAmount = $this->currentAmount / 100;
                     $this->display = money_format("%.2n", $displayAmount);
                     break;
                 case 'quarter':
                     $this->currentAmount += $qty * 25;
+                    $this->bank['quarter'] += $qty;
                     $displayAmount = $this->currentAmount / 100;
                     $this->display = money_format("%.2n", $displayAmount);
                     break;
-                default:
-                    $this->coinReturnContents = [
-                        $type => ++$qty
-                    ];
+                case 'penny':
+                    $this->coinReturnContents = [$qty => $type];
+                    break;
             }
         }
     }
