@@ -26,6 +26,19 @@ class VendingMachineClassTest extends PHPUnit_Framework_TestCase
         $this->machine->acceptCoins([1 => 'nickel']);
         $this->assertEquals(5, $this->machine->currentAmount);
         $this->assertEquals('$0.05', $this->machine->display);
+    }
 
+    public function testCustomerInsertsOneDime()
+    {
+        $this->machine->acceptCoins([1 => 'dime']);
+        $this->assertEquals(10, $this->machine->currentAmount);
+        $this->assertEquals('$0.10', $this->machine->display);
+    }
+
+    public function testCustomerInsertsOneQuarter()
+    {
+        $this->machine->acceptCoins([1 => 'quarter']);
+        $this->assertEquals(25, $this->machine->currentAmount);
+        $this->assertEquals('$0.25', $this->machine->display);
     }
 }

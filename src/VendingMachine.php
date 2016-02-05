@@ -42,17 +42,25 @@ class VendingMachine
         // As a vendor
         // I want a vending machine that accepts coins
         // So that I can collect money from the customer
+
+        setlocale(LC_MONETARY, 'en_US.UTF-8');
+
         foreach ($coins as $qty => $type) {
             switch ($type) {
                 case 'nickel':
                     $this->currentAmount += $qty * 5;
-                    $this->display = '$' . (number_format($this->currentAmount, 2))/100;
+                    $displayAmount = $this->currentAmount / 100;
+                    $this->display = money_format("%.2n", $displayAmount);
                     break;
                 case 'dime':
-                    //
+                    $this->currentAmount += $qty * 10;
+                    $displayAmount = $this->currentAmount / 100;
+                    $this->display = money_format("%.2n", $displayAmount);
                     break;
                 case 'quarter':
-                    //
+                    $this->currentAmount += $qty * 25;
+                    $displayAmount = $this->currentAmount / 100;
+                    $this->display = money_format("%.2n", $displayAmount);
                     break;
                 default:
                     $this->coinReturnContents = [
