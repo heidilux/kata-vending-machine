@@ -131,4 +131,15 @@ class VendingMachineClassTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($coins, $this->machine->coinReturnContents);
     }
 
+    public function testCustomerGetsAllCoinsBackAfterCoinReturnIsPushed()
+    {
+        $coins = ['nickel' => 1, 'dime' => 4, 'quarter' => 6];
+        $this->machine->acceptCoins($coins);
+        $this->assertEquals(195, $this->machine->currentAmount);
+        $this->assertEquals('$1.95', $this->machine->display);
+
+        $this->machine->returnCoins($coins);
+        $this->assertEquals($coins, $this->machine->coinReturnContents);
+    }
+
 }
