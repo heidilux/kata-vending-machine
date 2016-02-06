@@ -60,35 +60,33 @@ class VendingMachine
         return $this->display;
     }
 
-    public function acceptCoins(array $coins)
+    public function acceptCoin($coin)
     {
         setlocale(LC_MONETARY, 'en_US.UTF-8');
-
-        foreach ($coins as $type => $qty) {
-            switch ($type) {
-                case 'nickel':
-                    $this->coins['nickel'] += 1;
-                    $this->currentAmount += $qty * 5;
-                    $displayAmount = $this->currentAmount / 100;
-                    $this->display = money_format("%.2n", $displayAmount);
-                    break;
-                case 'dime':
-                    $this->coins['dime'] += 1;
-                    $this->currentAmount += $qty * 10;
-                    $displayAmount = $this->currentAmount / 100;
-                    $this->display = money_format("%.2n", $displayAmount);
-                    break;
-                case 'quarter':
-                    $this->coins['quarter'] += 1;
-                    $this->currentAmount += $qty * 25;
-                    $displayAmount = $this->currentAmount / 100;
-                    $this->display = money_format("%.2n", $displayAmount);
-                    break;
-                case 'penny':
-                    $this->coinReturnContents[$type] += $qty;
-                    break;
-            }
+        switch ($coin) {
+            case 'nickel':
+                $this->coins['nickel'] += 1;
+                $this->currentAmount += 5;
+                $displayAmount = $this->currentAmount / 100;
+                $this->display = money_format("%.2n", $displayAmount);
+                break;
+            case 'dime':
+                $this->coins['dime'] += 1;
+                $this->currentAmount += 10;
+                $displayAmount = $this->currentAmount / 100;
+                $this->display = money_format("%.2n", $displayAmount);
+                break;
+            case 'quarter':
+                $this->coins['quarter'] += 1;
+                $this->currentAmount += 25;
+                $displayAmount = $this->currentAmount / 100;
+                $this->display = money_format("%.2n", $displayAmount);
+                break;
+            case 'penny':
+                $this->coinReturnContents['penny'] += 1;
+                break;
         }
+
     }
 
     public function selectProduct($product)
