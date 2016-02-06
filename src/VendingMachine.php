@@ -100,6 +100,7 @@ class VendingMachine
             } else {
                 $this->display = 'THANK YOU';
                 $this->productDispensed = true;
+                $this->products[$product]['inventory'] -= 1;
                 foreach ($this->coins as $type => $qty) {
                     $this->bank[$type] += $qty;
                 }

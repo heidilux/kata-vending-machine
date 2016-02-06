@@ -284,6 +284,7 @@ class VendingMachineClassTest extends PHPUnit_Framework_TestCase
         $this->machine->selectProduct('cola');
         $this->assertEquals('THANK YOU', $this->machine->checkDisplay());
         $this->assertTrue($this->machine->productDispensed);
+        $this->assertEquals(4, $this->machine->products['cola']['inventory']);
         $this->assertEquals([
             'nickel'    => 10,
             'dime'      => 10,
