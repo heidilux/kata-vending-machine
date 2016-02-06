@@ -266,8 +266,10 @@ class VendingMachineClassTest extends PHPUnit_Framework_TestCase
     {
         $previousInventory = $this->machine->products['cola']['inventory'];
         $this->machine->products['cola']['inventory'] = 0;
-        $coins = ['quarter' => 4];
-        $this->machine->acceptCoin($coins);
+        $this->machine->acceptCoin('quarter');
+        $this->machine->acceptCoin('quarter');
+        $this->machine->acceptCoin('quarter');
+        $this->machine->acceptCoin('quarter');
         $this->machine->selectProduct('cola');
         $this->assertEquals('SOLD OUT', $this->machine->checkDisplay());
         $this->machine->products['cola']['inventory'] = $previousInventory;

@@ -49,44 +49,34 @@ class VendingMachine
         ];
     }
 
-    public function resetInitialState()
-    {
-        $this->__construct();
-    }
-
     public function checkDisplay()
     {
         $this->checkIfWeRequireExactChange();
         return $this->display;
     }
 
-    public function acceptCoin($coin)
+    public function acceptCoin($coinType)
     {
         setlocale(LC_MONETARY, 'en_US.UTF-8');
-        switch ($coin) {
-            case 'nickel':
-                $this->coins['nickel'] += 1;
-                $this->currentAmount += 5;
-                $displayAmount = $this->currentAmount / 100;
-                $this->display = money_format("%.2n", $displayAmount);
-                break;
-            case 'dime':
-                $this->coins['dime'] += 1;
-                $this->currentAmount += 10;
-                $displayAmount = $this->currentAmount / 100;
-                $this->display = money_format("%.2n", $displayAmount);
-                break;
-            case 'quarter':
-                $this->coins['quarter'] += 1;
-                $this->currentAmount += 25;
-                $displayAmount = $this->currentAmount / 100;
-                $this->display = money_format("%.2n", $displayAmount);
-                break;
-            case 'penny':
-                $this->coinReturnContents['penny'] += 1;
-                break;
-        }
 
+        // if it's a penny, drop it in the coin return right away
+        if ($coinType == 'penny') {
+            $this->coinReturnContents['penny'] += 1;
+        } else {
+            // otherwise, count it towards the total
+            $this->coins[$coinType] += 1;
+            if ($coinType == 'nickel') {
+                $this->currentAmount += 5;
+            } elseif ($coinType == 'dime') {
+                $this->currentAmount += 10;
+            } elseif ($coinType == 'quarter') {
+                $this->currentAmount += 25;
+            }
+
+            // set what's going to be shown on the display
+            $displayAmount = $this->currentAmount / 100;
+            $this->display = money_format("%.2n", $displayAmount);
+        }
     }
 
     public function selectProduct($product)
@@ -117,6 +107,7 @@ class VendingMachine
             }
         }
 
+        // Do we owe the customer change?
         if ($overPayment > 0) {
             $this->makeChange($overPayment);
         }
