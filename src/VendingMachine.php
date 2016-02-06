@@ -4,9 +4,9 @@
 class VendingMachine
 {
     public $display;
+    public $bank = [];
     public $coins = [];
     public $change = [];
-    public $bank = [];
     public $products = [];
     public $currentAmount;
     public $validCoins = [];
@@ -16,17 +16,22 @@ class VendingMachine
 
     public function __construct()
     {
-        $this->display = "INSERT COINS";
-        $this->productDispensed = false;
         $this->change = [];
         $this->currentAmount = 0;
         $this->coinReturnContents = [];
-        $this->validCoins = ['nickel', 'dime', 'quarter'];
+        $this->display = "INSERT COINS";
+        $this->productDispensed = false;
         $this->invalidCoins = ['penny'];
+        $this->validCoins = ['nickel', 'dime', 'quarter'];
         $this->bank = [
             'nickel'    => 10,
             'dime'      => 10,
             'quarter'   => 10
+        ];
+        $this->coins = [
+            'nickel'    => 0,
+            'dime'      => 0,
+            'quarter'   => 0
         ];
         $this->products = [
             'chips' => [
@@ -44,31 +49,37 @@ class VendingMachine
         ];
     }
 
+    public function resetInitialState()
+    {
+        $this->__construct();
+    }
+
     public function checkDisplay()
     {
         $this->checkIfWeRequireExactChange();
-
         return $this->display;
     }
 
     public function acceptCoins(array $coins)
     {
         setlocale(LC_MONETARY, 'en_US.UTF-8');
-        $this->coins = $coins;
 
         foreach ($coins as $type => $qty) {
             switch ($type) {
                 case 'nickel':
+                    $this->coins['nickel'] += 1;
                     $this->currentAmount += $qty * 5;
                     $displayAmount = $this->currentAmount / 100;
                     $this->display = money_format("%.2n", $displayAmount);
                     break;
                 case 'dime':
+                    $this->coins['dime'] += 1;
                     $this->currentAmount += $qty * 10;
                     $displayAmount = $this->currentAmount / 100;
                     $this->display = money_format("%.2n", $displayAmount);
                     break;
                 case 'quarter':
+                    $this->coins['quarter'] += 1;
                     $this->currentAmount += $qty * 25;
                     $displayAmount = $this->currentAmount / 100;
                     $this->display = money_format("%.2n", $displayAmount);
@@ -83,6 +94,8 @@ class VendingMachine
     public function selectProduct($product)
     {
         $productPrice = $this->products[$product]['price'];
+
+        // What do we display if no money is inserted?
         if ($this->currentAmount == 0) {
             if ($this->products[$product]['inventory'] == 0) {
                 $this->display = "SOLD OUT";
@@ -92,6 +105,7 @@ class VendingMachine
             }
         }
 
+        // Enough money has been inserted for the selected product
         if ($this->currentAmount >= $productPrice) {
             if ($this->products[$product]['inventory'] == 0) {
                 $this->display = "SOLD OUT";
@@ -114,15 +128,15 @@ class VendingMachine
     {
         while ($overPayment >= 5) {
             if ($overPayment >= 25) {
-                $this->change['quarter'] = 1;
+                $this->change['quarter'] += 1;
                 $this->bank['quarter'] -= 1;
                 $overPayment -= 25;
             } elseif ($overPayment >= 10) {
-                $this->change['dime'] = 1;
+                $this->change['dime'] += 1;
                 $this->bank['dime'] -= 1;
                 $overPayment -= 10;
             } elseif ($overPayment >= 5) {
-                $this->change['nickel'] = 1;
+                $this->change['nickel'] += 1;
                 $this->bank['nickel'] -= 1;
                 $overPayment -= 5;
             }
@@ -130,9 +144,9 @@ class VendingMachine
         $this->coinReturnContents = $this->change;
     }
 
-    public function returnCoins(array $coins)
+    public function returnCoins()
     {
-        $this->coinReturnContents = $coins;
+        $this->coinReturnContents = $this->coins;
     }
 
     public function checkIfWeRequireExactChange()

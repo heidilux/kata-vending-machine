@@ -33,6 +33,11 @@ class VendingMachineClassTest extends PHPUnit_Framework_TestCase
             'quarter'   => 0
         ];
         $this->assertEquals('EXACT CHANGE ONLY', $this->machine->checkDisplay());
+        $this->machine->bank = [
+            'nickel'    => 10,
+            'dime'      => 10,
+            'quarter'   => 10
+        ];
     }
 
     public function testCustomerInsertsOneNickel()
@@ -186,25 +191,51 @@ class VendingMachineClassTest extends PHPUnit_Framework_TestCase
 
     public function testCustomerGetsNickelBackAfterInsertingANickelAndCoinReturnIsPushed()
     {
-        $coins = ['nickel' => 1];
-        $this->machine->acceptCoins($coins);
+        $this->machine->acceptCoins(['nickel' => 1]);
         $this->assertEquals(5, $this->machine->currentAmount);
         $this->assertEquals('$0.05', $this->machine->checkDisplay());
 
-        $this->machine->returnCoins($coins);
-        $this->assertEquals($coins, $this->machine->coinReturnContents);
+        $this->machine->returnCoins();
+        $this->assertEquals([
+            'nickel'    => 1,
+            'dime'      => 0,
+            'quarter'   => 0
+        ], $this->machine->coinReturnContents);
     }
 
-    // this one might be a bit off with the way the coins are returned...
+    // get a whole bunch of coins back...
     public function testCustomerGetsAllCoinsBackAfterCoinReturnIsPushed()
     {
-        $coins = ['nickel' => 1, 'dime' => 4, 'quarter' => 6];
-        $this->machine->acceptCoins($coins);
-        $this->assertEquals(195, $this->machine->currentAmount);
-        $this->assertEquals('$1.95', $this->machine->checkDisplay());
+        $this->machine->acceptCoins(['nickel' => 1]);
+        $this->assertEquals(5, $this->machine->currentAmount);
+        $this->assertEquals('$0.05', $this->machine->checkDisplay());
 
-        $this->machine->returnCoins($coins);
-        $this->assertEquals($coins, $this->machine->coinReturnContents);
+        $this->machine->acceptCoins(['dime' => 1]);
+        $this->assertEquals(15, $this->machine->currentAmount);
+        $this->assertEquals('$0.15', $this->machine->checkDisplay());
+
+        $this->machine->acceptCoins(['dime' => 1]);
+        $this->assertEquals(25, $this->machine->currentAmount);
+        $this->assertEquals('$0.25', $this->machine->checkDisplay());
+
+        $this->machine->acceptCoins(['quarter' => 1]);
+        $this->assertEquals(50, $this->machine->currentAmount);
+        $this->assertEquals('$0.50', $this->machine->checkDisplay());
+
+        $this->machine->acceptCoins(['quarter' => 1]);
+        $this->assertEquals(75, $this->machine->currentAmount);
+        $this->assertEquals('$0.75', $this->machine->checkDisplay());
+
+        $this->machine->acceptCoins(['quarter' => 1]);
+        $this->assertEquals(100, $this->machine->currentAmount);
+        $this->assertEquals('$1.00', $this->machine->checkDisplay());
+
+        $this->machine->returnCoins();
+        $this->assertEquals([
+            'nickel'    => 1,
+            'dime'      => 2,
+            'quarter'   => 3
+        ], $this->machine->coinReturnContents);
     }
 
     /***************************************************
@@ -243,8 +274,10 @@ class VendingMachineClassTest extends PHPUnit_Framework_TestCase
 
     public function testCustomerMakesASelectionWithExactChangeInserted()
     {
-        $coins = ['quarter' => 4];
-        $this->machine->acceptCoins($coins);
+        $this->machine->acceptCoins(['quarter' => 1]);
+        $this->machine->acceptCoins(['quarter' => 1]);
+        $this->machine->acceptCoins(['quarter' => 1]);
+        $this->machine->acceptCoins(['quarter' => 1]);
         $this->machine->selectProduct('cola');
         $this->assertEquals('THANK YOU', $this->machine->checkDisplay());
         $this->assertTrue($this->machine->productDispensed);
@@ -257,8 +290,9 @@ class VendingMachineClassTest extends PHPUnit_Framework_TestCase
 
     public function testCustomerMakesASelectionThatRequiresChange()
     {
-        $coins = ['quarter' => 3];
-        $this->machine->acceptCoins($coins);
+        $this->machine->acceptCoins(['quarter' => 1]);
+        $this->machine->acceptCoins(['quarter' => 1]);
+        $this->machine->acceptCoins(['quarter' => 1]);
         $this->machine->selectProduct('candy');
         $this->assertEquals('THANK YOU', $this->machine->checkDisplay());
         $this->assertTrue($this->machine->productDispensed);
@@ -272,8 +306,18 @@ class VendingMachineClassTest extends PHPUnit_Framework_TestCase
 
     public function testCustomerMakesASelectionThatRequiresMoreChange()
     {
-        $coins = ['quarter' => 4, 'nickel' => 6];
-        $this->machine->acceptCoins($coins);
+        $this->machine->acceptCoins(['quarter' => 1]);
+        $this->machine->acceptCoins(['quarter' => 1]);
+        $this->machine->acceptCoins(['quarter' => 1]);
+        $this->machine->acceptCoins(['quarter' => 1]);
+        $this->machine->acceptCoins(['nickel' => 1]);
+        $this->machine->acceptCoins(['nickel' => 1]);
+        $this->machine->acceptCoins(['nickel' => 1]);
+        $this->machine->acceptCoins(['nickel' => 1]);
+        $this->machine->acceptCoins(['nickel' => 1]);
+        $this->machine->acceptCoins(['nickel' => 1]);
+        $this->assertEquals(130, $this->machine->currentAmount);
+        $this->assertEquals("$1.30", $this->machine->checkDisplay());
         $this->machine->selectProduct('cola');
         $this->assertEquals('THANK YOU', $this->machine->checkDisplay());
         $this->assertTrue($this->machine->productDispensed);
