@@ -1,0 +1,19 @@
+{
+  "name": "heidilux/basic-php-phpunit-template",
+  "description": "Empty template for running TDD Katas",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Josh Pike",
+      "email": "josh@joshdpike.com"
+    }
+  ],
+  "require": {
+    "phpunit/phpunit": "^4.8"
+  },
+  "autoload": {
+    "classmap": [
+      "src"
+    ]
+  }
+}
